@@ -111,7 +111,7 @@ def _real_process_job(data, jobs, temp_dir):
             explore_view_image_fpath, thumbnail_image_fpath,
             main_image_fpath,
         ]:
-            directory = data['path'].rsplit('/', 1)[0]
+            directory = data['cloudPath'].rsplit('/', 1)[0]
             blob_path = '{}/{}'.format(
                 directory, os.path.basename(image_fpath))
             _logger.debug('Uploading to {}'.format(blob_path))

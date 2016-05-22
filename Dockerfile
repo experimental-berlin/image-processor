@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y build-essential libjpeg-dev zlib1g-dev 
 
 # Cache dependencies in order to speed up builds
 COPY requirements.txt requirements.txt
+RUN pip install -U pip
 RUN pip install -U -r requirements.txt
 
 RUN apt-get -y remove build-essential && apt-get autoremove -y && apt-get clean
