@@ -3,3 +3,4 @@ cchardet
 oauth2client
 pillow
 requests
+gcloud
