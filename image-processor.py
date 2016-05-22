@@ -53,13 +53,13 @@ def _resize_image(original_image, width, height, original_fpath, suffix):
     if original_aspect_ratio > target_aspect_ratio:
         _logger.debug('Padding target image by height')
         target_width = width
-        target_height = (width / original_width) * height
+        target_height = width / original_aspect_ratio
         offset_x = 0
         offset_y = int((height - target_height) / 2)
     else:
         _logger.debug('Padding target image by width')
         target_height = height
-        target_width = (height / original_height) * width
+        target_width = height * original_aspect_ratio
         offset_x = int((width - target_width) / 2)
         offset_y = 0
 
@@ -122,7 +122,7 @@ def _real_process_job(data, jobs, temp_dir):
         _logger.debug('Success!')
         extless_url, url_ext = os.path.splitext(data['url'])
         return {**data, **{
-            'thumbNailUrl': '{}-thumbnail{}'.format(extless_url, url_ext),
+            'thumbNailUrl': '{}-thumb{}'.format(extless_url, url_ext),
             'mainUrl': '{}-main{}'.format(extless_url, url_ext),
             'exploreUrl': '{}-explore{}'.format(extless_url, url_ext),
         }}
