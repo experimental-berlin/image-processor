@@ -120,7 +120,12 @@ def _real_process_job(data, jobs, temp_dir):
             blob.make_public()
 
         _logger.debug('Success!')
-        return data
+        extless_url, url_ext = os.path.splitext(data['url'])
+        return {**data, **{
+            'thumbNailUrl': '{}-thumbnail{}'.format(extless_url, url_ext),
+            'mainUrl': '{}-main{}'.format(extless_url, url_ext),
+            'exploreUrl': '{}-explore{}'.format(extless_url, url_ext),
+        }}
     else:
         if response.status_code == 404:
             _logger.warn('Couldn\'t find {}'.format(data['url']))
