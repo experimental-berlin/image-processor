@@ -17,6 +17,9 @@ dependencies:
     - echo "Just overriding CircleCI inferred dependency installation..."
   cache_directories:
     - ~/docker
+test:
+  override:
+    - echo "No tests so far"
 deployment:
   test:
     branch: master
