@@ -1,0 +1,4 @@
+aiohttp
+cchardet
+oauth2client
+pillow
