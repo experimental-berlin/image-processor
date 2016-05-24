@@ -1,2 +1,2 @@
-# image-processor
+# Image Processor
 Image processing service for MuzHack.
