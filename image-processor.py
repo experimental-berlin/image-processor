@@ -12,6 +12,7 @@ from aiohttp import web
 from gcloud import storage as gcs
 from oauth2client.service_account import ServiceAccountCredentials
 
+
 _root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 os.chdir(_root_dir)
 
