@@ -135,9 +135,8 @@ def _real_process_job(data, jobs, temp_dir):
         response.raise_for_status()
 
 
-async def add_job(request):
+async def _add_job(request):
     """Add job to queue."""
-
     _logger.debug('Received request to add job')
     data = await request.json()
     _logger.debug('Received json: {}'.format(data))
@@ -184,6 +183,6 @@ _manager = multiprocessing.Manager()
 _jobs_list = _manager.list()
 
 _app = web.Application(logger=_logger)
-_app.router.add_route('POST', '/jobs', add_job)
+_app.router.add_route('POST', '/jobs', _add_job)
 
 web.run_app(_app, port=10000)
