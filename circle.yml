@@ -25,14 +25,14 @@ deployment:
     branch: master
     commands:
       - if [[ -e ~/docker/image-test.tar ]]; then docker load -i ~/docker/image-test.tar; fi
-      - docker build -t $EXTERNAL_REGISTRY_ENDPOINT/image-processor-test .
-      - mkdir -p ~/docker; docker save $EXTERNAL_REGISTRY_ENDPOINT/image-processor-test > ~/docker/image-test.tar
-      - gcloud docker push $EXTERNAL_REGISTRY_ENDPOINT/image-processor-test
+      - docker build -t $EXTERNAL_REGISTRY_ENDPOINT/project-processor-test .
+      - mkdir -p ~/docker; docker save $EXTERNAL_REGISTRY_ENDPOINT/project-processor-test > ~/docker/image-test.tar
+      - gcloud docker push $EXTERNAL_REGISTRY_ENDPOINT/project-processor-test
   production:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: muzhack
     commands:
       - if [[ -e ~/docker/image-production.tar ]]; then docker load -i ~/docker/image-production.tar; fi
-      - docker build -t $EXTERNAL_REGISTRY_ENDPOINT/image-processor:$CIRCLE_TAG .
-      - mkdir -p ~/docker; docker save $EXTERNAL_REGISTRY_ENDPOINT/image-processor:$CIRCLE_TAG > ~/docker/image-production.tar
-      - gcloud docker push $EXTERNAL_REGISTRY_ENDPOINT/image-processor:$CIRCLE_TAG
+      - docker build -t $EXTERNAL_REGISTRY_ENDPOINT/project-processor:$CIRCLE_TAG .
+      - mkdir -p ~/docker; docker save $EXTERNAL_REGISTRY_ENDPOINT/project-processor:$CIRCLE_TAG > ~/docker/image-production.tar
+      - gcloud docker push $EXTERNAL_REGISTRY_ENDPOINT/project-processor:$CIRCLE_TAG

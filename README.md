@@ -1,2 +1,3 @@
-# Image Processor
-Image processing service for MuzHack, taking care of resizing images.
+# Project Processor
+Project processing service for MuzHack, taking care of resizing images and converting Markdown
+documents.
