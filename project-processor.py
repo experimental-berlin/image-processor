@@ -11,6 +11,7 @@ from PIL import Image
 from aiohttp import web
 from gcloud import storage as gcs
 from oauth2client.service_account import ServiceAccountCredentials
+from pprint import pformat
 
 
 _root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -84,7 +85,7 @@ def _resize_image(original_image, width, height, original_fpath, suffix):
 
 
 def _real_process_job(data, jobs, temp_dir):
-    _logger.debug('Processing picture {}'.format(data['url']))
+    _logger.debug('Processing job {}'.format(pformat(data)))
 
     response = requests.get(data['url'], stream=True)
     if response.status_code == 200:

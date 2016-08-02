@@ -5,9 +5,8 @@ WORKDIR /app
 ENTRYPOINT ["./document-processor.py"]
 EXPOSE 10000
 
-RUN apt-get update && apt-get install -y build-essential libjpeg-dev zlib1g-dev libtiff-dev \
-# Pandoc
-pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
+RUN apt-get update && apt-get install -y build-essential libjpeg-dev zlib1g-dev libtiff-dev
+RUN apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
 # Cache dependencies in order to speed up builds
 COPY requirements.txt requirements.txt
