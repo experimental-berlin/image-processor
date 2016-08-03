@@ -161,6 +161,8 @@ margin-bottom: 1in
 # Bill of Materials
 {}
 
+\newpage
+
 {}
 """.format(data['title'], data['author'], bom, instructions)
     with open('instructions.md', 'wt') as f:
