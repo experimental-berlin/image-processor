@@ -180,7 +180,8 @@ margin-bottom: 1in
 
     bucket = _gcs_client.bucket(_settings['GCLOUD_BUCKET'])
     directory = data['cloudDirectory']
-    blob_path = '{}/{}'.format(directory, 'instructions.pdf')
+    blob_path = '{}/{}'.format(directory, '{}-instructions.pdf'.format(
+        data['id'].replace('/', '-')))
     _logger.debug('Uploading to {}'.format(blob_path))
     blob = bucket.blob(blob_path)
     blob.upload_from_filename('instructions.pdf')
