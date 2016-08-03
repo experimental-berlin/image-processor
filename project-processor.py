@@ -14,6 +14,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pprint import pformat
 import subprocess
 from base64 import b64encode
+import time
 
 
 _root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -22,7 +23,7 @@ os.chdir(_root_dir)
 logging.basicConfig(
     format='%(name)s - %(levelname)s - %(asctime)s %(message)s',
     level=logging.WARNING)
-_logger = logging.getLogger('app')
+_logger = logging.getLogger('project-processor')
 _logger.setLevel(logging.DEBUG)
 
 
@@ -32,7 +33,7 @@ def _process_job(data, jobs):
         os.makedirs(temp_dir)
     for entry in os.listdir(temp_dir):
         entry = os.path.join(temp_dir, entry)
-        if entry not in [j['name'] for j in jobs]:
+        if entry not in [j['id'] for j in jobs]:
             _logger.debug(
                 'Removing stale temporary directory \'{}\''.format(entry))
             shutil.rmtree(entry)
@@ -139,6 +140,8 @@ def _process_picture(data):
 
 
 def _process_instructions(data):
+    _logger.debug('Processing build instructions...')
+
     instructions = data['instructions']
     bom = data['bom']
     instructions_pdf_source = r"""---
@@ -147,7 +150,6 @@ author: {}
 header-includes:
     - \usepackage{{fancyhdr}}
     - \pagestyle{{fancy}}
-    - \fancyhead[CO,CE]{{This is fancy}}
 papersize: A4
 documentclass: article
 margin-left: 1in
@@ -160,9 +162,11 @@ margin-bottom: 1in
 {}
 
 {}
-""".format(data['name'], data['author'], bom, instructions)
+""".format(data['title'], data['author'], bom, instructions)
     with open('instructions.md', 'wt') as f:
         f.write(instructions_pdf_source)
+
+    start = time.time()
 
     subprocess.check_call(
         ['pandoc', '-o', 'instructions.pdf', 'instructions.md']
@@ -171,6 +175,11 @@ margin-bottom: 1in
     with open('instructions.pdf', 'rb') as f:
         instructions_pdf = f.read()
 
+    time_taken = time.time() - start
+
+    _logger.debug(
+        'Successfully processed build instructions in {} second(s)'
+        .format(time_taken))
     return {
         'pdf': b64encode(instructions_pdf).decode(),
     }
