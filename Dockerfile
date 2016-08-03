@@ -2,7 +2,7 @@ FROM python:3.5-slim
 MAINTAINER MuzHack Team <contact@muzhack.com>
 
 WORKDIR /app
-ENTRYPOINT ["./document-processor.py"]
+ENTRYPOINT ["./project-processor.py"]
 EXPOSE 10000
 
 RUN apt-get update && apt-get install -y build-essential libjpeg-dev zlib1g-dev libtiff-dev
