@@ -191,6 +191,8 @@ margin-bottom: 1in
     blob.upload_from_filename('instructions.pdf')
     blob.make_public()
 
+    return blob_path
+
 
 def _real_process_job(data, jobs, temp_dir):
     _logger.debug('Processing job {}'.format(pformat(data)))
@@ -206,7 +208,7 @@ def _real_process_job(data, jobs, temp_dir):
             picture_results.append(_process_picture(picture))
         process_results['pictures'] = picture_results
 
-        _process_instructions(data)
+        process_results['instructionsPdfPath'] = _process_instructions(data)
     finally:
         os.chdir(orig_dir)
 
