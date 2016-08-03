@@ -143,7 +143,16 @@ def _process_instructions(data):
     _logger.debug('Processing build instructions...')
 
     instructions = data['instructions']
-    bom = data['bom']
+    bom = data.get('bom')
+    if bom:
+        bom_section = r"""# Bill of Materials
+{}
+
+\newpage
+
+""".format(bom)
+    else:
+        bom_section = ''
     instructions_pdf_source = r"""---
 title: {} Build Instructions
 author: {}
@@ -157,14 +166,9 @@ margin-right: 1in
 margin-top: 1in
 margin-bottom: 1in
 ---
-
-# Bill of Materials
 {}
-
-\newpage
-
 {}
-""".format(data['title'], data['author'], bom, instructions)
+""".format(data['title'], data['author'], bom_section, instructions)
     with open('instructions.md', 'wt') as f:
         f.write(instructions_pdf_source)
 
