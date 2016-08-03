@@ -12,6 +12,8 @@ from aiohttp import web
 from gcloud import storage as gcs
 from oauth2client.service_account import ServiceAccountCredentials
 from pprint import pformat
+import subprocess
+from base64 import b64encode
 
 
 _root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -25,18 +27,19 @@ _logger.setLevel(logging.DEBUG)
 
 
 def _process_job(data, jobs):
-    temp_dir = '/tmp/muzhack/pictures'
+    temp_dir = '/tmp/muzhack/projects'
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-    for fname in os.listdir(temp_dir):
-        fpath = os.path.join(temp_dir, fname)
-        if fname not in [j['name'] for j in jobs]:
-            _logger.debug('Removing stale temporary file \'{}\''.format(fpath))
-            os.remove(fpath)
+    for entry in os.listdir(temp_dir):
+        entry = os.path.join(temp_dir, entry)
+        if entry not in [j['name'] for j in jobs]:
+            _logger.debug(
+                'Removing stale temporary directory \'{}\''.format(entry))
+            shutil.rmtree(entry)
         else:
             _logger.debug(
-                'Not removing temporary file \'{}\' as it is in use'.format(
-                    fpath))
+                'Not removing temporary directory \'{}\' as it is in use'
+                .format(entry))
 
     jobs.append(data)
     try:
@@ -84,12 +87,10 @@ def _resize_image(original_image, width, height, original_fpath, suffix):
     return fpath
 
 
-def _real_process_job(data, jobs, temp_dir):
-    _logger.debug('Processing job {}'.format(pformat(data)))
-
+def _process_picture(data):
     response = requests.get(data['url'], stream=True)
     if response.status_code == 200:
-        fpath = os.path.join(temp_dir, data['name'])
+        fpath = data['name']
         with open(fpath, 'wb') as f:
             response.raw.decode_content = True
             shutil.copyfileobj(response.raw, f)
@@ -135,6 +136,66 @@ def _real_process_job(data, jobs, temp_dir):
             _logger.warn('Failed to download {}: {}'.format(
                 data['url'], error))
         response.raise_for_status()
+
+
+def _process_instructions(data):
+    instructions = data['instructions']
+    bom = data['bom']
+    instructions_pdf_source = r"""---
+title: {} Build Instructions
+author: {}
+header-includes:
+    - \usepackage{{fancyhdr}}
+    - \pagestyle{{fancy}}
+    - \fancyhead[CO,CE]{{This is fancy}}
+papersize: A4
+documentclass: article
+margin-left: 1in
+margin-right: 1in
+margin-top: 1in
+margin-bottom: 1in
+---
+
+# Bill of Materials
+{}
+
+{}
+""".format(data['name'], data['author'], bom, instructions)
+    with open('instructions.md', 'wt') as f:
+        f.write(instructions_pdf_source)
+
+    subprocess.check_call(
+        ['pandoc', '-o', 'instructions.pdf', 'instructions.md']
+    )
+
+    with open('instructions.pdf', 'rb') as f:
+        instructions_pdf = f.read()
+
+    return {
+        'pdf': b64encode(instructions_pdf).decode(),
+    }
+
+
+def _real_process_job(data, jobs, temp_dir):
+    _logger.debug('Processing job {}'.format(pformat(data)))
+
+    orig_dir = os.getcwd()
+    new_dir = os.path.join(temp_dir, data['id'])
+    os.makedirs(new_dir)
+    os.chdir(new_dir)
+    process_results = {}
+    picture_results = []
+    try:
+        for picture in data['pictures']:
+            picture_results.append(_process_picture(picture))
+        process_results['pictures'] = picture_results
+
+        process_results['instructions'] = _process_instructions(data)
+    finally:
+        os.chdir(orig_dir)
+
+    _logger.debug('Finished processing')
+    return process_results
 
 
 async def _add_job(request):
