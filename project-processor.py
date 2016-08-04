@@ -145,38 +145,91 @@ def _process_instructions(data):
     instructions = data['instructions']
     bom = data.get('bom')
     if bom:
-        bom_section = r"""# Bill of Materials
+        bom_section = r"""<h1>Bill of Materials</h1>
 {}
-
-\newpage
-
 """.format(bom)
     else:
         bom_section = ''
-    instructions_pdf_source = r"""---
-title: {} Build Instructions
-author: {}
-header-includes:
-    - \usepackage{{fancyhdr}}
-    - \pagestyle{{fancy}}
-papersize: A4
-documentclass: article
-margin-left: 1in
-margin-right: 1in
-margin-top: 1in
-margin-bottom: 1in
----
+    instructions_pdf_source = r"""<html>
+<head>
+  <link rel="stylesheet"
+    href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="pdf.css">
+</head>
+<body>
+<div class="container">
 {}
 {}
-""".format(data['title'], data['author'], bom_section, instructions)
-    with open('instructions.md', 'wt') as f:
+</div>
+</body>
+</html>
+""".format(bom_section, instructions)
+    with open('instructions.html', 'wt') as f:
         f.write(instructions_pdf_source)
+
+    with open('pdf.css', 'wt') as f:
+        f.write("""\
+.container {
+  width: 100%;
+  padding: 60px;
+  box-sizing: border-box;
+}
+
+.container > :first-child {
+  margin-top: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+  border: 1px solid #cbcbcb;
+}
+
+thead {
+  background-color: #e0e0e0;
+  color: #000;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+td:first-child, th:first-child {
+  border-left-width: 0;
+}
+
+td, th {
+  padding: 0.5em 1em;
+  border-left: 1px solid #cbcbcb;
+  border-width: 0 0 0 1px;
+  font-size: inherit;
+  margin: 0;
+  overflow: visible;
+  padding: .5em 1em;
+}
+
+td {
+  background-color: transparent;
+}
+
+tr:nth-child(2n-1) td {
+  background-color: #f2f2f2;
+}
+""")
 
     start = time.time()
 
-    subprocess.check_call(
-        ['pandoc', '-o', 'instructions.pdf', 'instructions.md']
-    )
+    subprocess.check_call([
+        'wkhtmltopdf', '-q', '--title', data['title'], '--print-media-type',
+        'instructions.html', 'instructions.pdf',
+    ])
     time_taken = time.time() - start
     _logger.debug(
         'Successfully processed build instructions in {} second(s)'
