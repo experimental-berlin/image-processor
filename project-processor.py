@@ -147,6 +147,7 @@ def _process_instructions(data):
     if bom:
         bom_section = r"""<h1>Bill of Materials</h1>
 {}
+<hr>
 """.format(bom)
     else:
         bom_section = ''
@@ -159,7 +160,6 @@ def _process_instructions(data):
 <body>
 <div class="container">
 {}
-<hr>
 <div id="instructions">
 {}
 </div>
