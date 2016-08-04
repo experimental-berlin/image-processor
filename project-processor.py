@@ -151,8 +151,10 @@ def _process_instructions(data):
 """.format(bom)
     else:
         bom_section = ''
-    instructions_pdf_source = r"""<html>
+    instructions_pdf_source = r"""\
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <link rel="stylesheet"
     href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
   <link rel="stylesheet" href="pdf.css">
