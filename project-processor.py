@@ -159,6 +159,7 @@ def _process_instructions(data):
 <body>
 <div class="container">
 {}
+<hr>
 {}
 </div>
 </body>
