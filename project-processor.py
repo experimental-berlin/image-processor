@@ -160,7 +160,9 @@ def _process_instructions(data):
 <div class="container">
 {}
 <hr>
+<div id="instructions">
 {}
+</div>
 </div>
 </body>
 </html>
@@ -177,6 +179,15 @@ def _process_instructions(data):
 }
 
 .container > :first-child {
+  margin-top: 0;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#instructions > :first-child {
   margin-top: 0;
 }
 
