@@ -240,7 +240,7 @@ tr:nth-child(2n-1) td {
 
     document_title = '{} Build Instructions'.format(data['title'])
     subprocess.check_call([
-        'wkhtmltopdf', '-q', '--title', document_title, '--print-media-type',
+        'wkhtmltopdf', '-q', '--title', document_title,
         'instructions.html', 'instructions.pdf',
     ])
     time_taken = time.time() - start
