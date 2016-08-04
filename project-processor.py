@@ -15,6 +15,10 @@ from pprint import pformat
 import subprocess
 from base64 import b64encode
 import time
+import platform
+
+
+_is_linux = platform.system().lower() == 'linux'
 
 
 _root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -241,10 +245,14 @@ tr:nth-child(2n-1) td {
     start = time.time()
 
     document_title = '{} Build Instructions'.format(data['title'])
-    subprocess.check_call([
+    command = [
         'wkhtmltopdf', '-q', '--title', document_title,
         'instructions.html', 'instructions.pdf',
-    ])
+    ]
+    if _is_linux:
+        # Needed to run wkhtmltopdf headless
+        command.insert(0, 'xvfb-run')
+    subprocess.check_call(command)
     time_taken = time.time() - start
     _logger.debug(
         'Successfully processed build instructions in {} second(s)'
