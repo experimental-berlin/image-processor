@@ -160,6 +160,7 @@ def _process_instructions(data):
   <meta charset="utf-8">
   <link rel="stylesheet"
     href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
   <link rel="stylesheet" href="pdf.css">
 </head>
 <body>
@@ -176,7 +177,11 @@ def _process_instructions(data):
         f.write(instructions_pdf_source)
 
     with open('pdf.css', 'wt') as f:
-        f.write(""".container {
+        f.write("""html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.container {
   width: 100%;
   padding: 60px;
   box-sizing: border-box;
