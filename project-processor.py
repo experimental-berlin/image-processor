@@ -55,36 +55,27 @@ def _process_job(data, jobs):
 
 def _resize_image(original_image, width, height, original_fpath, suffix):
     _logger.debug('Resizing image to {}, {}'.format(width, height))
-    target_image = Image.new('RGBA', (width, height), 'white')
+    cropped_image = original_image.copy()
     (original_width, original_height,) = original_image.size
     original_aspect_ratio = original_width / original_height
 
     target_aspect_ratio = width / height
     if original_aspect_ratio > target_aspect_ratio:
-        _logger.debug('Padding target image by height')
-        target_width = width
-        target_height = width / original_aspect_ratio
-        offset_x = 0
-        offset_y = int((height - target_height) / 2)
+        _logger.debug('Truncating source image horizontally')
+        offset_x = (original_width - original_height * target_aspect_ratio) / \
+            2.
+        cropped_image = cropped_image.crop((
+            offset_x, 0, original_width - offset_x, original_height,
+        ))
     else:
-        _logger.debug('Padding target image by width')
-        target_height = height
-        target_width = height * original_aspect_ratio
-        offset_x = int((width - target_width) / 2)
-        offset_y = 0
+        _logger.debug('Truncating source image vertically')
+        offset_y = (original_height - original_width / target_aspect_ratio) / \
+            2.
+        cropped_image = cropped_image.crop((
+            0, offset_y, original_width, original_height - offset_y
+        ))
 
-    target_width = int(target_width)
-    target_height = int(target_height)
-    resized_image = original_image.resize(
-        (target_width, target_height,), resample=Image.LANCZOS)
-    _logger.debug(
-        'Resized original image to {}, {} before pasting into new picture'
-        .format(resized_image.width, resized_image.height)
-    )
-    target_image.paste(
-        resized_image,
-        (offset_x, offset_y, offset_x + target_width,
-            offset_y + target_height))
+    target_image = cropped_image.resize((width, height,), Image.LANCZOS)
     extless_fpath, ext = os.path.splitext(original_fpath)
     fpath = '{}-{}{}'.format(extless_fpath, suffix, ext)
     _logger.debug('Saving resized image to \'{}\''.format(fpath))
@@ -105,19 +96,14 @@ def _process_picture(data):
         ))
         original_image = Image.open(fpath)
         explore_view_image_fpath = _resize_image(
-            original_image, 218, 172, fpath, 'explore')
-        thumbnail_image_fpath = _resize_image(
-            original_image, 100, 82, fpath, 'thumb')
-        main_image_fpath = _resize_image(
-            original_image, 500, 409, fpath, 'main')
+            original_image, 494, 380, fpath, 'explore')
         _logger.debug('Finished processing picture {}, uploading...'.format(
             data['url']
         ))
 
         bucket = _gcs_client.bucket(_settings['GCLOUD_BUCKET'])
         for image_fpath in [
-            explore_view_image_fpath, thumbnail_image_fpath,
-            main_image_fpath,
+            explore_view_image_fpath,
         ]:
             directory = data['cloudPath'].rsplit('/', 1)[0]
             blob_path = '{}/{}'.format(
@@ -130,8 +116,6 @@ def _process_picture(data):
         _logger.debug('Success!')
         extless_url, url_ext = os.path.splitext(data['url'])
         return {**data, **{
-            'thumbNailUrl': '{}-thumb{}'.format(extless_url, url_ext),
-            'mainUrl': '{}-main{}'.format(extless_url, url_ext),
             'exploreUrl': '{}-explore{}'.format(extless_url, url_ext),
         }}
     else:
