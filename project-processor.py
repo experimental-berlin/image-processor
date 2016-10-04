@@ -233,8 +233,8 @@ tr:nth-child(2n-1) td {
 
     document_title = '{} Build Instructions'.format(data['title'])
     command = [
-        'wkhtmltopdf', '-q', '--title', document_title,
-        'instructions.html', 'instructions.pdf',
+        'wkhtmltopdf', '-q', '--title', document_title, '--footer-center',
+        '[page]/[topage]', 'instructions.html', 'instructions.pdf',
     ]
     if _is_linux:
         # Needed to run wkhtmltopdf headless
