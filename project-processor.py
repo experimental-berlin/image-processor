@@ -132,7 +132,7 @@ def _process_instructions(data):
 
     instructions = data['instructions']
     bom = data.get('bom')
-    if bom:
+    if bom is not None:
         bom_section = r"""<h1>Bill of Materials</h1>
 {}
 <hr>
