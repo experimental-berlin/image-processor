@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Project processor."""
 import logging
 import json
 import multiprocessing
@@ -9,8 +10,8 @@ import os.path
 import requests
 from PIL import Image
 from aiohttp import web
-from gcloud import storage as gcs
-from oauth2client.service_account import ServiceAccountCredentials
+from google.cloud import storage as gcs
+from google.oauth2.service_account import Credentials
 from pprint import pformat
 import subprocess
 from base64 import b64encode
@@ -310,12 +311,10 @@ def _load_settings():
 
 _settings = _load_settings()
 
-_credentials = ServiceAccountCredentials.from_json_keyfile_dict({
-    'type': 'service_account',
+_credentials = Credentials.from_service_account_info({
+    'token_uri': 'https://accounts.google.com/o/oauth2/token',
     'client_email': _settings['GCLOUD_CLIENT_EMAIL'],
     'private_key': _settings['GCLOUD_PRIVATE_KEY'],
-    'private_key_id': _settings['GCLOUD_PRIVATE_KEY_ID'],
-    'client_id': _settings['GCLOUD_CLIENT_ID'],
 })
 _gcs_client = gcs.Client(
     project=_settings['GCLOUD_PROJECT_ID'], credentials=_credentials)

@@ -1,6 +1,6 @@
 aiohttp
 cchardet
-oauth2client
 pillow
 requests
-gcloud
+google-cloud
+google-auth
